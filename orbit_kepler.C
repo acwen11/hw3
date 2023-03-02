@@ -159,7 +159,6 @@ int main(int argc, char** argv) {
       //cout<<j<<" "<<omegap<<endl;
     }
     double phi_out = (2*M_PI*norbitphi+thetanew);
-    cout << "This is phi_out: " << phi_out << "/n" << endl;
 	
     double rr0=x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
     double rrm1=x[j-1]*x[j-1]+y[j-1]*y[j-1]+z[j-1]*z[j-1];
