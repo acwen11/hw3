@@ -39,7 +39,8 @@ int main(int argc, char** argv) {
 
  
   double alpha = atof(argv[1]);
-  string name = argv[2];
+  double eccen = atof(argv[2]);
+  string name = argv[3];
   
   //The initial position lies in the x-z plane, as determiined by the angular momentum values
   //xinit = lzinit/linit;
@@ -61,7 +62,7 @@ int main(int argc, char** argv) {
   // The inital velocity is in the y-direction, and is set by the angular momentum as well
   //  double eccentricity = sqrt(1-linit*linit);
 
-  vyinit=0.1;
+  vyinit = pow(1 - eccen * eccen, 0.25);
   //cout<<"vyinit:"<<vyinit<<endl;
 
   vxinit=0.0;
