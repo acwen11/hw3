@@ -142,7 +142,8 @@ int main(int argc, char** argv) {
     double rrm1=x[j-1]*x[j-1]+y[j-1]*y[j-1]+z[j-1]*z[j-1];
     double rrp1=x[j+1]*x[j+1]+y[j+1]*y[j+1]+z[j+1]*z[j+1];
     // Per Joshie's Original Comment: These inequalities assume the orbit starts at periastron? TODO: Verify
-    if((rr0<rrm1) && (rr0<rrp1)) {
+    // Currently in apostron config
+    if((rr0>rrm1) && (rr0>rrp1)) {
 	norbitr+=1;
 	cout<<"rad: "<<j<<" "<<t[j]<<" "<<norbitr<< " " << rr0 << " " << 2*M_PI*norbitr/t[j]<<endl;
     }
