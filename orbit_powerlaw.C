@@ -39,13 +39,15 @@ int main(int argc, char** argv) {
 
  
   double alpha = atof(argv[1]);
+  double eccen = atof(argv[2]);
+  string name = argv[3];
   
   //The initial position lies in the x-z plane, as determiined by the angular momentum values
   //xinit = lzinit/linit;
   //zinit = sqrt(1.0-xinit*xinit);
 
   double rinit = 1.0;
-  cout<<"rinit?:"<<rinit<<endl;
+  //cout<<"rinit?:"<<rinit<<endl;
 
   xinit=rinit;
   yinit=0.0;
@@ -53,15 +55,15 @@ int main(int argc, char** argv) {
 
   double potd[3];
   double potval =potential(xinit,0.0,0.0,alpha,potd);
-  cout<<"potval:"<<potval<<endl;
+  //cout<<"potval:"<<potval<<endl;
     
 
   
   // The inital velocity is in the y-direction, and is set by the angular momentum as well
   //  double eccentricity = sqrt(1-linit*linit);
 
-  vyinit=0.1;
-  cout<<"vyinit:"<<vyinit<<endl;
+  vyinit = pow(1 - eccen * eccen, 0.25);
+  //cout<<"vyinit:"<<vyinit<<endl;
 
   vxinit=0.0;
   vzinit=0.0;
@@ -117,40 +119,35 @@ int main(int argc, char** argv) {
     
     t[i]=t[i-1]+step;
 
-    //    cout<<"orbit"<<x[i]<<" "<<y[i]<<endl;
   }
 
+  ofstream outfile;
+  outfile.open(name + "_orbit.dat");
 
   double theta=0.0;
   int norbitphi=0;
   int norbitr=0;
-  for (j=1; j<i-1; j++) {
-
+  for(j=0; j<i; j++) {
+    
     double thetanew=atan2(y[j],x[j]);
     if(thetanew<0)thetanew+=2*M_PI;
     if(y[j]>0 && y[j-1]<0) {
       norbitphi+=1;
       double omegap = (2*M_PI*norbitphi+thetanew)/t[j];
-      //      cout<<"phi:"<<j<<" "<<t[j]<<" "<<norbitphi<<" "<<thetanew<<" "<<omegap<<" "<<x[j]<<" "<<y[j]<<endl;
-      cout<<"phi:"<<j<<" "<<omegap<<endl;
+      cout<<"phi: "<<j<<" "<<t[j]<<" "<<norbitphi<<" "<<thetanew<<" "<<omegap<<endl;
     }
+    double phi_out = (2*M_PI*norbitphi+thetanew);
 	
     double rr0=x[j]*x[j]+y[j]*y[j]+z[j]*z[j];
     double rrm1=x[j-1]*x[j-1]+y[j-1]*y[j-1]+z[j-1]*z[j-1];
     double rrp1=x[j+1]*x[j+1]+y[j+1]*y[j+1]+z[j+1]*z[j+1];
-
-    // This is for orbits initially at apostron.
-    // For initial periastron, reverse the inequailities!
+    // Per Joshie's Original Comment: These inequalities assume the orbit starts at periastron? TODO: Verify
+    // Currently in apostron config
     if((rr0>rrm1) && (rr0>rrp1)) {
 	norbitr+=1;
-	//cout<<"rad:"<<j<<" "<<t[j]<<" "<<2*M_PI*norbitr/t[j]<<endl;
-	cout<<"rad:"<<j<<" "<<2*M_PI*norbitr/t[j]<<endl;
+	cout<<"rad: "<<j<<" "<<t[j]<<" "<<norbitr<< " " << rr0 << " " << 2*M_PI*norbitr/t[j]<<endl;
     }
-  }
-  
-  ofstream outfile;
-  outfile.open("orbit.dat");
-  for(j=0; j<i; j++) {
+
     if(j%100==0) {
       double E = 0.5*(vx[j]*vx[j]+vy[j]*vy[j]+vz[j]*vz[j])+potential(x[j],y[j],z[j],alpha,potderivs);
       double LX = y[j]*vz[j]-z[j]*vy[j];
@@ -161,6 +158,7 @@ int main(int argc, char** argv) {
       double rcyl=sqrt(x[j]*x[j]+y[j]*y[j]);
       double vr = (x[j]*vx[j]+y[j]*vy[j]+z[j]*vz[j])/r;
       double vrcyl = (x[j]*vx[j]+y[j]*vy[j])/rcyl;
+
 
       //This is the "eccentricity vector" for the orbit
       double evecx = (vy[j]*LZ-vz[j]*LY)-x[j]/r;
@@ -174,7 +172,7 @@ int main(int argc, char** argv) {
 	
       outfile<<t[j]<<" "<<x[j]<<" "<<y[j]<<" "<<z[j]<<
 	" "<<vx[j]<<" "<<vy[j]<<" "<<vz[j]<<" "<<E<<" "<<LX<<" "<<LY<<" "<<LZ<<" "<<r<<" "<<rcyl<<
-	" "<<LL <<" "<<omega<<" "<<eccen<<" "<<evecx<<" "<<evecy<<" "<<evecz<<endl;
+	" "<<LL <<" "<<omega<<" "<<eccen<<" "<<evecx<<" "<<evecy<<" "<<evecz<<" "<<phi_out<<endl;
       //     if(z[j]>0 && z[j-1]<0 && j>=2)outfile2<<rcyl<<" "<<vrcyl<<endl;
     }
   }
